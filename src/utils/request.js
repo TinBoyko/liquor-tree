@@ -13,7 +13,7 @@ function request (url) {
         resolve(response)
       } catch (e) {
         reject(e)
-      };
+      }
     })
 
     xhr.send(null)
@@ -30,7 +30,7 @@ export function createTemplate (template) {
     let m
     let result = template
 
-    while (m = re.exec(result)) {
+    while ((m = re.exec(result))) {
       result = result.replace(m[0], source[m[1]])
     }
 

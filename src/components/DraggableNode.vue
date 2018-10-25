@@ -1,5 +1,7 @@
 <template>
-  <div class="tree-dragnode" :style="style">
+  <div 
+    :style="style" 
+    class="tree-dragnode">
     {{ target.node.text }}
   </div>
 </template>
@@ -7,9 +9,14 @@
 <script>
   export default {
     name: 'DragNode',
-    props: ['target'],
+    props: {
+      target : {
+        type: Object,
+        default: () => {}
+      }
+    },
     computed: {
-      style() {
+      style () {
         if (undefined === this.target.top) {
           return 'display: none'
         }

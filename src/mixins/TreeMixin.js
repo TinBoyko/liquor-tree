@@ -1,6 +1,6 @@
-import Tree from '@/lib/Tree'
-import initKeyboardNavigation from '@/utils/keyboardNavigation'
-import assert from '@/utils/assert'
+import Tree from '../lib/Tree'
+import initKeyboardNavigation from '../utils/keyboardNavigation'
+import assert from '../utils/assert'
 
 function initEvents (vm) {
   const { multiple, checkbox } = vm.opts
@@ -30,18 +30,16 @@ function initEvents (vm) {
   }
 
   tree.$on('node:added', (targetNode, newNode) => {
-    const node = newNode || targetNode
-
     if (checkbox) {
-      if (node.state('checked') && !tree.checkedNodes.has(node)) {
-        tree.checkedNodes.add(node)
+      if (newNode.state('checked') && !tree.checkedNodes.has(newNode)) {
+        tree.checkedNodes.add(newNode)
       }
 
-      node.refreshIndeterminateState()
+      newNode.refreshIndeterminateState()
     }
 
-    if (node.state('selected') && !tree.selectedNodes.has(node)) {
-      tree.select(node)
+    if (newNode.state('selected') && !tree.selectedNodes.has(newNode)) {
+      tree.select(newNode)
     }
 
     emitter()
@@ -196,12 +194,6 @@ export default {
 
     sort (...args) {
       return this.tree.sort(...args)
-    },
-
-    getRootNode () {
-      return this.tree.model.length === 1
-        ? this.tree.model[0]
-        : this.tree.model
     },
 
     toJSON () {

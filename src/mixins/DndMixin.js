@@ -72,14 +72,6 @@ function highlightDropDestination (e, element) {
   return dropPosition
 }
 
-function callDndCb (args, opts, method) {
-  if (!opts || !opts[method] || typeof opts[method] !== 'function') {
-    return
-  }
-
-  return !!opts[method](...args)
-}
-
 export default {
   methods: {
     onDragStart (e) {
@@ -87,10 +79,6 @@ export default {
     },
 
     startDragging (node, event) {
-      if (!node.isDraggable() || callDndCb([node], this.tree.options.dnd, 'onDragStart') === false) {
-        return
-      }
-
       this.$$startDragPosition = [event.clientX, event.clientY]
       this.$$possibleDragNode = node
 
@@ -100,21 +88,12 @@ export default {
     initDragListeners () {
       let dropPosition
 
-      const removeListeners = () => {
-        window.removeEventListener('mouseup', onMouseUp, true)
-        window.removeEventListener('mousemove', onMouseMove, true)
-      }
-
       const onMouseUp = (e) => {
         if (!this.$$startDragPosition) {
           e.stopPropagation()
         }
 
-        if (this.draggableNode) {
-          this.draggableNode.node.state('dragging', false)
-        }
-
-        if (this.$$dropDestination && this.tree.isNode(this.$$dropDestination)) {
+        if (this.$$dropDestination) {
           updateHelperClasses(this.$$dropDestination.vm.$el, null)
 
           this.draggableNode.node.finishDragging(this.$$dropDestination, dropPosition)
@@ -124,7 +103,8 @@ export default {
         this.$$possibleDragNode = null
         this.$set(this, 'draggableNode', null)
 
-        removeListeners()
+        window.removeEventListener('mouseup', onMouseUp, true)
+        window.removeEventListener('mousemove', onMouseMove, true)
       }
 
       const onMouseMove = (e) => {
@@ -135,14 +115,8 @@ export default {
         }
 
         if (this.$$possibleDragNode) {
-          if (this.$$possibleDragNode.startDragging() === false) {
-            removeListeners()
-            this.$$possibleDragNode = null
-
-            return
-          }
-
           this.$set(this, 'draggableNode', { node: this.$$possibleDragNode, left: 0, top: 0 })
+          this.$$possibleDragNode.startDragging()
           this.$$possibleDragNode = null
         }
 
@@ -164,17 +138,6 @@ export default {
 
           if (!this.$$dropDestination || this.$$dropDestination.id !== dropDestinationId) {
             this.$$dropDestination = this.tree.getNodeById(dropDestinationId)
-
-            const cbResult = callDndCb(
-              [this.draggableNode.node, this.$$dropDestination],
-              this.tree.options.dnd,
-              'onDragFinish'
-            )
-
-            if (!this.$$dropDestination.isDropable() || cbResult === false) {
-              this.$$dropDestination = null
-              return
-            }
           }
 
           dropPosition = highlightDropDestination(e, dropDestination)

@@ -1,14 +1,13 @@
-import Node from '@/lib/Node'
-import Selection from '@/lib/Selection'
+import Node from '../lib/Node'
+import Selection from '../lib/Selection'
 
-import find from '@/utils/find'
-import objectToNode from '@/utils/objectToNode'
-import { List } from '@/utils/stack'
-import { TreeParser } from '@/utils/treeParser'
-import { recurseDown } from '@/utils/recurse'
-import { get, createTemplate } from '@/utils/request'
-import sort from '@/utils/sort'
-import fetchDelay from '@/utils/fetchDelay'
+import find from '../utils/find'
+import objectToNode from '../utils/objectToNode'
+import { List } from '../utils/stack'
+import { TreeParser } from '../utils/treeParser'
+import { recurseDown } from '../utils/recurse'
+import { get, createTemplate } from '../utils/request'
+import sort from '../utils/sort'
 
 export default class Tree {
   constructor (vm) {
@@ -172,10 +171,6 @@ export default class Tree {
 
     this.$emit('tree:data:fetch', node)
 
-    if (this.options.minFetchDelay > 0) {
-      node.vm.loading = true
-    }
-
     const result = this.fetch(node)
       .then(children => {
         node.append(children)
@@ -190,13 +185,7 @@ export default class Tree {
         this.$emit('tree:data:received', node)
       })
 
-    return Promise.all([
-      fetchDelay(this.options.minFetchDelay),
-      result
-    ]).then(_ => {
-      node.vm.loading = false
-      return result
-    })
+    return result
   }
 
   fetch (node) {
@@ -340,7 +329,7 @@ export default class Tree {
   unselectAll () {
     let node
 
-    while (node = this.selectedNodes.pop()) {
+    while ((node = this.selectedNodes.pop())) {
       node.unselect()
     }
 
@@ -370,7 +359,7 @@ export default class Tree {
   uncheckAll () {
     let node
 
-    while (node = this.checkedNodes.pop()) {
+    while ((node = this.checkedNodes.pop())) {
       node.uncheck()
     }
 
@@ -646,7 +635,7 @@ export default class Tree {
   }
 
   find (criteria, multiple) {
-    if (this.isNode(criteria)) {
+    if (criteria instanceof Node) {
       return criteria
     }
 
@@ -667,7 +656,7 @@ export default class Tree {
     let targetNode = null
 
     recurseDown(this.model, node => {
-      if ('' + node.id === id) {
+      if (node.id === id) {
         targetNode = node
         return false
       }
@@ -677,7 +666,7 @@ export default class Tree {
   }
 
   getNode (node) {
-    if (this.isNode(node)) {
+    if (node instanceof Node) {
       return node
     }
 

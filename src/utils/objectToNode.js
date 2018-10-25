@@ -1,5 +1,5 @@
-import Node from '@/lib/Node'
-import uuidV4 from '@/utils/uuidV4'
+import Node from '../lib/Node'
+import uuidV4 from './uuidV4'
 
 /**
 * Default Node's states
@@ -15,12 +15,32 @@ const nodeStates = {
   matched: false,
   editable: true,
   dragging: false,
-  draggable: true,
-  dropable: true
+  fetching: false,
+  fetched: false
 }
 
 function merge (state = {}) {
   return Object.assign({}, nodeStates, state)
+}
+
+function getPermissionsArray (node) {
+  if (!node.data.userPermissions) {
+    return false
+  }
+  let names = ['read', 'write', 'exec'];
+  let user = [];
+  let group = [];
+  let other = [];
+  let permissions = [];
+
+  names.forEach(name => {
+    user.push(node.data.userPermissions[name]);
+    group.push(node.data.groupPermissions[name]);
+    other.push(node.data.otherPermissions[name]);
+  });
+
+  permissions = [user, group, other];
+  return permissions;
 }
 
 export default function objectToNode (tree, obj) {
@@ -41,6 +61,8 @@ export default function objectToNode (tree, obj) {
   } else {
     node = new Node(tree, obj)
     node.states = merge(node.states)
+    node.permissions = getPermissionsArray(node) 
+    node.isLeaf = node.data.type === 0
 
     if (!node.id) {
       node.id = uuidV4()
