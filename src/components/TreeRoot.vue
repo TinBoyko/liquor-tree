@@ -38,11 +38,11 @@
 </template>
 
 <script>
-import TreeNode from './TreeNode'
-import DraggableNode from './DraggableNode'
-import TreeMixin from '../mixins/TreeMixin'
-import TreeDnd from '../mixins/DndMixin'
-// import Tree from '../lib/Tree'
+  import TreeNode from '@/components/TreeNode'
+  import DraggableNode from '@/components/DraggableNode'
+  import TreeMixin from '@/mixins/TreeMixin'
+  import TreeDnd from '@/mixins/DndMixin'
+  import Tree from '@/lib/Tree'
 
 const defaults = {
   multiple: true,

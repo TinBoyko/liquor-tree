@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import NodeContent from './NodeContent'
+import NodeContent from '@/components/NodeContent'
 
 const TreeNode = {
   name: 'Node',
