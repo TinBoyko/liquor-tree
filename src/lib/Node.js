@@ -627,11 +627,12 @@ export default class Node {
   }
 
   toJSON () {
-    return {
-      text: this.text,
-      data: this.data,
-      state: this.states,
-      children: this.children.map(node => node.toJSON())
-    }
+    // return {
+    //   text: this.text,
+    //   data: this.data,
+    //   state: this.states,
+    //   children: this.children.map(node => node.toJSON())
+    // }
+    return JSON.parse(JSON.stringify(this))
   }
 }
