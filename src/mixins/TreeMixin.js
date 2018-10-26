@@ -200,6 +200,20 @@ export default {
       return JSON.parse(
         JSON.stringify(this.model)
       )
+    },
+
+    flatten () {
+      let model = []
+      this.recurseDown(n => {
+        let cloned = {
+          id: n.id,
+          data: JSON.parse(JSON.stringify(n.data)),
+          permissions: JSON.parse(JSON.stringify(n.permissions))
+        }
+        model.push(cloned)
+      })
+
+      return model
     }
   }
 
