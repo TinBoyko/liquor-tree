@@ -198,7 +198,7 @@ export default {
 
     toJSON () {
       return JSON.parse(
-        JSON.stringify(this.tree.model)
+        JSON.stringify(this.model)
       )
     }
   }
