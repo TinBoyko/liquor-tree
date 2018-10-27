@@ -597,6 +597,10 @@ export default class Tree {
       return false
     }
 
+    if (node.id === this.activeElement.id) {
+      this.activeElement = null
+    }
+
     if (!node.parent) {
       if (~this.model.indexOf(node)) {
         this.model.splice(
@@ -622,10 +626,6 @@ export default class Tree {
     }
 
     node.parent = null
-
-    if (node.id === this.activeElement.id) {
-      this.activeElement = null
-    }
 
     this.$emit('node:removed', node)
 
