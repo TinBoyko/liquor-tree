@@ -97,6 +97,9 @@ const TreeNode = {
     },
 
     typeIcon () {
+      if (typeof thos.node.icon !== 'undefined') {
+        return this.node.icon
+      }
       let icon = 'insert_drive_file'
       if (this.node.data.type !== 0) {
         if (this.state.expanded) {
