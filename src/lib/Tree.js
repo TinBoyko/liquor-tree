@@ -597,8 +597,10 @@ export default class Tree {
       return false
     }
 
-    if (node.id === this.activeElement.id) {
-      this.activeElement = null
+    if (this.activeElement !== null) {
+      if (node.id === this.activeElement.id) {
+        this.activeElement = null
+      }
     }
 
     if (!node.parent) {
