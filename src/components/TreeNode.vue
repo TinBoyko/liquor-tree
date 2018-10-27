@@ -94,25 +94,41 @@ const TreeNode = {
       }
 
       return classes
-    },
-
-    typeIcon () {
-      if (typeof thos.node.icon !== 'undefined') {
-        return this.node.icon
-      }
-      let icon = 'insert_drive_file'
-      if (this.node.data.type !== 0) {
-        if (this.state.expanded) {
-          icon = 'folder_open'
-        } else {
-          icon = 'folder'
-        }
-      }
-      return icon
     }
   },
 
   methods: {
+    typeIcon () {
+      let icon
+      if (typeof this.node.icon !== 'undefined') {
+        icon = this.node.icon
+
+        return icon
+      }
+
+      if (typeof this.$vuetify !== 'undefined') {
+        icon = this.$vuetify.icons.file.main
+        if (this.node.data.type !== 0) {
+          if (this.state.expanded) {
+            icon = this.$vuetify.icons.folder.expanded
+          } else {
+            icon = this.$vuetify.icons.folder.collapsed
+          }
+        }
+      } else {
+        icon = 'insert_drive_file'
+        if (this.node.data.type !== 0) {
+          if (this.state.expanded) {
+            icon = 'folder_open'
+          } else {
+            icon = 'folder'
+          }
+        }
+      }
+
+      return icon
+    },
+
     onNodeFocus () {
       this.tree.activeElement = this.node
     },
@@ -298,7 +314,7 @@ export default TreeNode
 .tree-arrow:after {
   position: absolute;
   display: block;
-  content: '';
+  content: "";
 }
 
 .tree-checkbox.checked,
