@@ -10,7 +10,7 @@
       @contextmenu.prevent="ctxMenuOpen($event)"
       @mouseup.stop="select">
 
-      <v-icon @mouseup.stop="toggleExpand">{{ typeIcon }}</v-icon>
+      <v-icon @mouseup.stop="toggleExpand">{{ typeIcon() }}</v-icon>
 
       <i 
         v-if="options.checkbox" 
