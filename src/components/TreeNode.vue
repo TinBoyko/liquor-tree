@@ -100,8 +100,8 @@ const TreeNode = {
   methods: {
     typeIcon () {
       let icon
-      if (typeof this.node.icon !== 'undefined') {
-        icon = this.node.icon
+      if (typeof this.node.data.icon !== 'undefined') {
+        icon = this.node.data.icon
 
         return icon
       }
