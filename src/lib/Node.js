@@ -1,6 +1,4 @@
-import {
-  recurseDown
-} from '@/utils/recurse'
+import { recurseDown } from '@/utils/recurse'
 import find from '@/utils/find'
 import uuidV4 from '@/utils/uuidV4'
 import Selection from '@/lib/Selection'
@@ -46,7 +44,7 @@ export default class Node {
 
     do {
       depth++
-    } while ((parent.parent))
+    } while (parent = parent.parent)
 
     return depth
   }
@@ -58,8 +56,10 @@ export default class Node {
   set text (text) {
     const oldText = this.text
 
-    this.data.text = text
-    this.$emit('text:changed', text, oldText)
+    if (oldText !== text) {
+      this.data.text = text
+      this.$emit('text:changed', text, oldText)
+    }
   }
 
   state (name, value) {
@@ -121,7 +121,7 @@ export default class Node {
         }
       })
 
-      if (checked === childrenCount - disabled) {
+      if (checked > 0 && checked === childrenCount - disabled) {
         if (!this.checked()) {
           this.state('checked', true)
           this.tree.check(this)
@@ -150,14 +150,6 @@ export default class Node {
 
   indeterminate () {
     return this.state('indeterminate')
-  }
-
-  fetching () {
-    return this.state('fetching')
-  }
-
-  fetched () {
-    return this.state('fetched')
   }
 
   editable () {
@@ -345,8 +337,6 @@ export default class Node {
   }
 
   expand () {
-    this.$emit('expand')
-
     if (!this.hasChildren() || this.expanded() || this.disabled()) {
       return this
     }
@@ -403,8 +393,16 @@ export default class Node {
     return this.expand()
   }
 
+  isDropable () {
+    return this.enabled() && this.state('dropable')
+  }
+
+  isDraggable () {
+    return this.enabled() && this.state('draggable') && !this.isEditing
+  }
+
   startDragging () {
-    if (this.disabled() || this.state('draggable') === false || this.state('dragging')) {
+    if (!this.isDraggable() || this.state('dragging')) {
       return false
     }
 
@@ -421,6 +419,10 @@ export default class Node {
   }
 
   finishDragging (destination, destinationPosition) {
+    if (!destination.isDropable()) {
+      return
+    }
+
     const tree = this.tree
     const clone = this.clone()
     const parent = this.parent
@@ -440,12 +442,14 @@ export default class Node {
       tree.selectedNodes.add(clone)
     }
 
-    destination.refreshIndeterminateState()
-
     this.remove()
 
-    parent.refreshIndeterminateState()
+    destination.refreshIndeterminateState()
+
+    parent && parent.refreshIndeterminateState()
     tree.__silence = false
+
+    clone.state('dragging', false)
     this.state('dragging', false)
     this.$emit('dragging:finish')
   }
@@ -564,7 +568,7 @@ export default class Node {
   empty () {
     let node
 
-    while ((node = this.children.pop())) {
+    while (node = this.children.pop()) {
       node.remove()
     }
 
@@ -586,7 +590,7 @@ export default class Node {
   }
 
   find (criteria, deep) {
-    if (criteria instanceof Node) {
+    if (this.tree.isNode(criteria)) {
       return criteria
     }
 
@@ -604,26 +608,14 @@ export default class Node {
   }
 
   /**
-   * Sometimes it's no need to have a parent. It possible to have more than 1 parent
-   */
+  * Sometimes it's no need to have a parent. It possible to have more than 1 parent
+  */
   isRoot () {
     return this.parent === null
   }
 
   clone () {
-    const node = new Node(
-      this.tree,
-      this.toJSON()
-    )
-
-    node.children = node.children.map(child => {
-      const c = new Node(this.tree, child)
-      c.parent = node
-      c.children = c.children.map(child => new Node(this.tree, child))
-      return c
-    })
-
-    return node
+    return this.tree.objectToNode(this.toJSON())
   }
 
   toJSON () {
@@ -631,8 +623,7 @@ export default class Node {
       text: this.text,
       data: this.data,
       state: this.states,
-      children: this.children.map(node => node.toJSON())
+      children: this.children.map(node => this.tree.objectToNode(node).toJSON())
     }
-    // return JSON.parse(JSON.stringify(this))
   }
 }
