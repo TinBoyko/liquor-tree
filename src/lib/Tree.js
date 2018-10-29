@@ -522,6 +522,8 @@ export default class Tree {
     })
 
     this.$emit('node:added', node)
+
+    return node
   }
 
   append(criteria, node) {
